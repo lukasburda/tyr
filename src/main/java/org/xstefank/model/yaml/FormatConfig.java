@@ -4,7 +4,9 @@ public class FormatConfig {
 
     private String repository;
     private String statusUrl;
-    private Format format;
+    private Format defaultFormat;
+    private Format bugFormat;
+    private Format featureFormat;
 
     public String getRepository() {
         return repository;
@@ -22,11 +24,27 @@ public class FormatConfig {
         this.statusUrl = statusUrl;
     }
 
-    public Format getFormat() {
-        return format;
+    public Format getDefaultFormat() {
+        return defaultFormat;
     }
 
-    public void setFormat(Format format) {
-        this.format = format;
+    public void setDefaultFormat(Format defaultFormat) {
+        this.defaultFormat = defaultFormat;
+    }
+
+    public Format getBugFormat() {
+        return bugFormat;
+    }
+
+    public void setBugFormat(Format bugFormat) {
+        this.bugFormat = bugFormat;
+    }
+
+    public Format getFeatureFormat() {
+        return featureFormat;
+    }
+
+    public void setFeatureFormat(Format featureFormat) {
+        this.featureFormat = featureFormat;
     }
 }

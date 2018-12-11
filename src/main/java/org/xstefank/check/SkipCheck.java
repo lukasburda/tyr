@@ -16,26 +16,26 @@ public class SkipCheck {
     }
 
     private static boolean skipByTitle(JsonNode payload, FormatConfig config) {
-        if (config.getFormat().getSkipPatterns().getTitle() != null) {
-            Matcher titleMatcher = config.getFormat().getSkipPatterns().getTitle().matcher(payload.get(Utils.PULL_REQUEST).get(Utils.TITLE).asText());
+        if (config.getDefaultFormat().getSkipPatterns().getTitle() != null) {
+            Matcher titleMatcher = config.getDefaultFormat().getSkipPatterns().getTitle().matcher(payload.get(Utils.PULL_REQUEST).get(Utils.TITLE).asText());
             return titleMatcher.matches();
         }
         return false;
     }
 
     private static boolean skipByCommit(JsonNode payload, FormatConfig config) {
-        if (config.getFormat().getSkipPatterns().getCommit() != null) {
-            LatestCommitCheck latestCommitCheck = new LatestCommitCheck(config.getFormat().getSkipPatterns().getCommit());
+        if (config.getDefaultFormat().getSkipPatterns().getCommit() != null) {
+            LatestCommitCheck latestCommitCheck = new LatestCommitCheck(config.getDefaultFormat().getSkipPatterns().getCommit());
             return (latestCommitCheck.check(payload) == null);
         }
         return false;
     }
 
     private static boolean skipByDescriptionFirstRow(JsonNode payload, FormatConfig config) {
-        if (config.getFormat().getSkipPatterns().getDescription() != null) {
+        if (config.getDefaultFormat().getSkipPatterns().getDescription() != null) {
             String description = payload.get(Utils.PULL_REQUEST).get(Utils.BODY).asText();
             String firstRow = description.split(System.lineSeparator(), 2)[0];
-            Matcher descriptionMatcher = config.getFormat().getSkipPatterns().getDescription().matcher(firstRow);
+            Matcher descriptionMatcher = config.getDefaultFormat().getSkipPatterns().getDescription().matcher(firstRow);
             return descriptionMatcher.matches();
         }
         return false;

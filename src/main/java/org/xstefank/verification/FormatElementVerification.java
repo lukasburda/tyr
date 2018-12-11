@@ -6,7 +6,7 @@ public class FormatElementVerification implements Verification {
 
     @Override
     public void verify(FormatConfig formatConfig) throws InvalidConfigurationException {
-        if (formatConfig.getFormat() == null)
+        if (formatConfig.getDefaultFormat() == null)
             throw new InvalidConfigurationException("Element 'format' is not specified");
     }
 }

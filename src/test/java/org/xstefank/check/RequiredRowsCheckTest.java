@@ -20,7 +20,7 @@ public class RequiredRowsCheckTest {
     @BeforeClass
     public static void beforeClass() {
         row = new Row();
-        row.setPattern(Pattern.compile("^Test.*description$"));
+        row.setPattern(Pattern.compile(".*Test.*description"));
         row.setMessage("Does not match");
     }
 

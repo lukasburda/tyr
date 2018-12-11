@@ -17,7 +17,7 @@ public class TestUtils {
     public static final JsonNode TEST_PAYLOAD = loadJson(JSON_DIR + "/testPayload.json");
     public static final JsonNode BAD_TEST_PAYLOAD = loadJson(JSON_DIR + "/badTestPayload.json");
     public static final JsonNode EMPTY_PAYLOAD = createEmptyJsonPayload();
-    public static final FormatConfig FOMAT_CONFIG = loadFormatFromYamlFile(YAML_DIR + "/testTemplate.yaml");
+    public static final FormatConfig FORMAT_CONFIG = loadFormatFromYamlFile(YAML_DIR + "/testTemplate.yaml");
     public static final String TEST_CONFIG_PATH = ConfigTest.class.getClassLoader().getResource("testConfig.properties").getPath();
 
     public static FormatConfig loadFormatFromYamlFile(String fileName) {

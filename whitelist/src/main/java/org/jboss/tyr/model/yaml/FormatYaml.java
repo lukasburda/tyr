@@ -13,28 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.tyr.additional.resource;
+package org.jboss.tyr.model.yaml;
 
-import org.jboss.tyr.Command;
-import org.jboss.tyr.CIOperations;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import javax.json.JsonObject;
+import java.util.List;
+import java.util.Map;
 
-public class DummyAdditionalCommand implements Command {
+public class FormatYaml {
 
-    private static boolean triggered = false;
+    private Map<String, String> commands;
 
-    @Override
-    public void process(JsonObject jsonObject, CIOperations operations) {
-        triggered = true;
+    @JsonProperty("CI")
+    private List<String> CI;
+
+    public Map<String, String> getCommands() {
+        return commands;
     }
 
-    @Override
-    public String getRegex() {
-        return "dummy-command";
+    public void setCommands(Map<String, String> commands) {
+        this.commands = commands;
     }
 
-    public static boolean isTriggered() {
-        return triggered;
+    public List<String> getCI() {
+        return CI;
+    }
+
+    public void setCI(List<String> CI) {
+        this.CI = CI;
     }
 }

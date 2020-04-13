@@ -15,9 +15,9 @@
  */
 package org.jboss.tyr.whitelist;
 
+import org.jboss.logging.Logger;
 import org.jboss.tyr.CIOperations;
 import org.jboss.tyr.Command;
-import org.jboss.logging.Logger;
 import org.jboss.tyr.InvalidPayloadException;
 import org.jboss.tyr.ci.CILoader;
 import org.jboss.tyr.ci.ContinuousIntegration;
@@ -25,7 +25,7 @@ import org.jboss.tyr.command.AbstractCommand;
 import org.jboss.tyr.command.CommandsLoader;
 import org.jboss.tyr.model.AdditionalResourcesLoader;
 import org.jboss.tyr.model.PersistentList;
-import org.jboss.tyr.model.TyrConfiguration;
+import org.jboss.tyr.model.TyrWhitelistConfiguration;
 import org.jboss.tyr.model.Utils;
 import org.jboss.tyr.model.yaml.FormatYaml;
 
@@ -55,7 +55,7 @@ public class WhitelistProcessing implements CIOperations {
     CILoader ciLoader;
 
     @Inject
-    TyrConfiguration configuration;
+    TyrWhitelistConfiguration configuration;
 
     @Inject
     AdditionalResourcesLoader additionalResourcesLoader;
@@ -130,7 +130,7 @@ public class WhitelistProcessing implements CIOperations {
     private List<Command> getCommands(FormatYaml config) {
         List<Command> commands = new ArrayList<>();
 
-        Map<String, String> regexMap = config.getFormat().getCommands();
+        Map<String, String> regexMap = config.getCommands();
         if (regexMap == null || regexMap.isEmpty()) {
             return commands;
         }
@@ -151,7 +151,7 @@ public class WhitelistProcessing implements CIOperations {
 
     private List<ContinuousIntegration> loadCIs(FormatYaml config) {
         List<ContinuousIntegration> continuousIntegrations = new ArrayList<>();
-        List<String> CIConfigList = config.getFormat().getCI();
+        List<String> CIConfigList = config.getCI();
 
         if (CIConfigList == null || CIConfigList.isEmpty()) {
             return continuousIntegrations;

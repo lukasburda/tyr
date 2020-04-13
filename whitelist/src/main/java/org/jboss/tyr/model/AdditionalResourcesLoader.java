@@ -16,7 +16,7 @@
 package org.jboss.tyr.model;
 
 import org.jboss.logging.Logger;
-import org.jboss.tyr.Check;
+import org.jboss.tyr.Command;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
@@ -35,20 +35,20 @@ public class AdditionalResourcesLoader {
     private static final Logger log = Logger.getLogger(AdditionalResourcesLoader.class);
 
     private URL[] jarURLs;
-    private List<Check> additionalChecks;
+    private List<Command> additionalCommands;
 
     @Inject
-    TyrConfiguration configuration;
+    TyrWhitelistConfiguration configuration;
 
     @PostConstruct
     public void init() {
         System.out.println(configuration.additionalResources().orElse("no found"));
         jarURLs = loadAdditionalJars();
-        additionalChecks = loadAdditionalResource(Check.class);
+        additionalCommands = loadAdditionalResource(Command.class);
     }
 
-    public List<Check> getAdditionalChecks() {
-        return additionalChecks;
+    public List<Command> getAdditionalCommands() {
+        return additionalCommands;
     }
 
     private URL[] loadAdditionalJars() {

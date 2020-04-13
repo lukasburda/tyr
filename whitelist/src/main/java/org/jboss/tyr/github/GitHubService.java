@@ -17,26 +17,21 @@ package org.jboss.tyr.github;
 
 import org.jboss.logging.Logger;
 import org.jboss.tyr.InvalidPayloadException;
-import org.jboss.tyr.model.CommitStatus;
-import org.jboss.tyr.model.StatusPayload;
-import org.jboss.tyr.model.TyrConfiguration;
+import org.jboss.tyr.model.TyrWhitelistConfiguration;
 import org.jboss.tyr.model.Utils;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.json.Json;
-import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import java.io.StringReader;
 import java.net.URI;
 
@@ -47,47 +42,10 @@ public class GitHubService {
     private static final Logger log = Logger.getLogger(GitHubService.class);
 
     @Inject
-    TyrConfiguration configuration;
+    TyrWhitelistConfiguration configuration;
 
-    public void updateCommitStatus(String repository, String sha, CommitStatus status,
-                                          String targetUrl, String description, String context) {
-
-        Client client = ClientBuilder.newClient();
-        URI statusUri = UriBuilder
-                .fromUri(Utils.GITHUB_BASE)
-                .path("/repos")
-                .path("/" + repository)
-                .path("/statuses")
-                .path("/" + sha)
-                .build();
-
-        WebTarget target = client.target(statusUri);
-
-        Entity<StatusPayload> json = Entity.json(new StatusPayload(status.toString(),
-                targetUrl, description, context));
-
-        log.debug("Sending status: " + json);
-        Response response = null;
-
-        try {
-            response = target.request()
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, "token " + configuration.oauthToken())
-                .post(json);
-
-            log.info("Github status update: " + response.getStatus());
-            log.debug("Github response: " + response.readEntity(String.class));
-        } catch (Throwable e) {
-            log.error("Cannot update GitHub status", e);
-        } finally {
-            if (response != null) {
-                response.close();
-            }
-        }
-    }
-
-    public JsonArray getCommitsJSON(JsonObject prPayload) throws InvalidPayloadException {
-        return getJSONReader(getCommitsUri(prPayload)).readArray();
+    public JsonObject getPullRequestJSON(JsonObject issuePayload) throws InvalidPayloadException {
+        return getJSONReader(getPullRequestUri(issuePayload)).readObject();
     }
 
     JsonReader getJSONReader(URI uri) {
@@ -121,9 +79,9 @@ public class GitHubService {
         }
     }
 
-    private static URI getCommitsUri(JsonObject prPayload) throws InvalidPayloadException {
+    private static URI getPullRequestUri(JsonObject issuePayload) throws InvalidPayloadException {
         try {
-            String url = prPayload.getJsonObject(Utils.PULL_REQUEST).getString(Utils.COMMITS_URL);
+            String url = issuePayload.getJsonObject(Utils.ISSUE).getJsonObject(Utils.PULL_REQUEST).getString(Utils.URL);
             return URI.create(url);
         } catch (NullPointerException e) {
             throw new InvalidPayloadException("Invalid payload, can't retrieve URL. ", e);

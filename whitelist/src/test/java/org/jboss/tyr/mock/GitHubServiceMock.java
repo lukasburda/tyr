@@ -7,7 +7,6 @@ import org.jboss.tyr.github.GitHubService;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
-import javax.json.JsonArray;
 import javax.json.JsonObject;
 
 @Mock
@@ -16,7 +15,7 @@ import javax.json.JsonObject;
 public class GitHubServiceMock extends GitHubService {
 
     @Override
-    public JsonArray getCommitsJSON(JsonObject prPayload) throws InvalidPayloadException {
-        return TestUtils.TEST_COMMITS_PAYLOAD;
+    public JsonObject getPullRequestJSON(JsonObject issuePayload) throws InvalidPayloadException {
+        return TestUtils.TEST_PAYLOAD;
     }
 }

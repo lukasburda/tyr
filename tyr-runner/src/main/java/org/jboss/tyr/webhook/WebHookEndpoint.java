@@ -27,7 +27,6 @@ import org.jboss.tyr.model.Utils;
 import org.jboss.tyr.model.yaml.FormatYaml;
 import org.jboss.tyr.verification.InvalidConfigurationException;
 import org.jboss.tyr.verification.VerificationHandler;
-import org.jboss.tyr.whitelist.WhitelistProcessing;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
@@ -49,9 +48,6 @@ public class WebHookEndpoint {
     TyrConfiguration configuration;
 
     @Inject
-    WhitelistProcessing whitelistProcessing;
-
-    @Inject
     GitHubService gitHubService;
 
     @Inject
@@ -65,7 +61,6 @@ public class WebHookEndpoint {
     @PostConstruct
     public void init() {
         format = readConfig();
-        whitelistProcessing.init(format);
         templateChecker.init(format);
     }
 
@@ -73,10 +68,15 @@ public class WebHookEndpoint {
     @Path("/pull-request")
     @Consumes(MediaType.APPLICATION_JSON)
     public void processRequest(JsonObject payload) throws InvalidPayloadException {
-        if (configuration.whitelistEnabled()) {
-            processPRWithWhitelisting(payload);
-        } else if (payload.getJsonObject(Utils.PULL_REQUEST) != null) {
-            processPullRequest(payload);
+        if (payload.getJsonObject(Utils.PULL_REQUEST) != null || !skipCheck.shouldSkip(payload, format)) {
+            String errorMessage = templateChecker.checkPR(payload);
+            if (errorMessage != null) {
+                gitHubService.updateCommitStatus(format.getRepository(),
+                        payload.getJsonObject(Utils.PULL_REQUEST).getJsonObject(Utils.HEAD).getString(Utils.SHA),
+                        errorMessage.isEmpty() ? CommitStatus.SUCCESS : CommitStatus.ERROR,
+                        format.getStatusUrl(),
+                        errorMessage.isEmpty() ? "valid" : errorMessage, "PR format");
+            }
         }
     }
 
@@ -94,35 +94,6 @@ public class WebHookEndpoint {
             return formatYaml;
         } catch (IOException | InvalidConfigurationException e) {
             throw new IllegalArgumentException("Cannot load configuration file", e);
-        }
-    }
-
-    private void processPullRequest(JsonObject prPayload) throws InvalidPayloadException {
-        if (!skipCheck.shouldSkip(prPayload, format)) {
-            String errorMessage = templateChecker.checkPR(prPayload);
-            if (errorMessage != null) {
-                gitHubService.updateCommitStatus(format.getRepository(),
-                        prPayload.getJsonObject(Utils.PULL_REQUEST).getJsonObject(Utils.HEAD).getString(Utils.SHA),
-                        errorMessage.isEmpty() ? CommitStatus.SUCCESS : CommitStatus.ERROR,
-                        format.getStatusUrl(),
-                        errorMessage.isEmpty() ? "valid" : errorMessage, "PR format");
-            }
-        }
-    }
-    private void processPRWithWhitelisting(JsonObject payload) throws InvalidPayloadException {
-        if (payload.getJsonObject(Utils.ISSUE) != null) {
-            whitelistProcessing.processPRComment(payload);
-        } else if (payload.getJsonObject(Utils.PULL_REQUEST) != null) {
-            processPullRequest(payload);
-            if (!payload.getString(Utils.ACTION).matches("opened")) {
-                return;
-            }
-            String username = payload.getJsonObject(Utils.PULL_REQUEST)
-                    .getJsonObject(Utils.USER)
-                    .getString(Utils.LOGIN);
-            if (whitelistProcessing.isUserEligibleToRunCI(username)) {
-                whitelistProcessing.triggerCI(payload.getJsonObject(Utils.PULL_REQUEST));
-            }
         }
     }
 }

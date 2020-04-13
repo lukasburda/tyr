@@ -32,7 +32,7 @@ public class TemplateCheckerTest {
 
     @Test
     public void testValidTemplateConfig() throws InvalidPayloadException {
-        templateChecker.init(TestUtils.FORMAT_CONFIG_CI);
+        templateChecker.init(TestUtils.FORMAT_CONFIG);
         Assertions.assertEquals("Dummy check failure", templateChecker.checkPR(TestUtils.TEST_PAYLOAD),
             "Valid PR should only fail with included additional check");
     }

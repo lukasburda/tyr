@@ -15,10 +15,7 @@
  */
 package org.jboss.tyr.model.yaml;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.List;
-import java.util.Map;
 
 public class Format {
 
@@ -27,10 +24,6 @@ public class Format {
     private SkipPatterns skipPatterns;
     private Description description;
     private List<String> additionalChecks;
-    private Map<String, String> commands;
-
-    @JsonProperty("CI")
-    private List<String> CI;
 
     public SkipPatterns getSkipPatterns() {
         return skipPatterns;
@@ -70,21 +63,5 @@ public class Format {
 
     public void setAdditionalChecks(List<String> additionalChecks) {
         this.additionalChecks = additionalChecks;
-    }
-
-    public Map<String, String> getCommands() {
-        return commands;
-    }
-
-    public void setCommands(Map<String, String> commands) {
-        this.commands = commands;
-    }
-
-    public List<String> getCI() {
-        return CI;
-    }
-
-    public void setCI(List<String> CI) {
-        this.CI = CI;
     }
 }

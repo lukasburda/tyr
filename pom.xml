@@ -68,6 +68,7 @@
         <module>tyr-runner</module>
         <module>tyr-api</module>
       <module>webhook</module>
+        <module>whitelist</module>
     </modules>
     <packaging>pom</packaging>
 

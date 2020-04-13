@@ -19,9 +19,7 @@ import io.quarkus.test.junit.QuarkusTest;
 import org.jboss.tyr.InvalidPayloadException;
 import org.jboss.tyr.TestUtils;
 import org.jboss.tyr.additional.resource.DummyAdditionalCheck;
-import org.jboss.tyr.additional.resource.DummyAdditionalCommand;
 import org.jboss.tyr.check.TemplateChecker;
-import org.jboss.tyr.whitelist.WhitelistProcessing;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -52,9 +50,6 @@ import javax.inject.Inject;
 public class AdditionalResourcesTest {
 
     @Inject
-    WhitelistProcessing whitelistProcessing;
-
-    @Inject
     TemplateChecker templateChecker;
 
     @Test
@@ -72,28 +67,15 @@ public class AdditionalResourcesTest {
     }
 
     @Test
-    public void additionalCommandsInvokedTest() throws InvalidPayloadException {
-
-        whitelistProcessing.init(TestUtils.FORMAT_CONFIG);
-        whitelistProcessing.processPRComment(TestUtils.ISSUE_PAYLOAD);
-
-        Assertions.assertTrue(DummyAdditionalCommand.isTriggered());
-    }
-
-
-    @Test
     @Disabled("Quarkus support for different config values")
     public void invalidPathAdditionalResourcesTest() throws InvalidPayloadException {
 //        System.setProperty(ADDITIONAL_RESOURCES_PROPERTY, "target/invalid-path.jar");
         templateChecker.init(TestUtils.FORMAT_CONFIG);
-        whitelistProcessing.init(TestUtils.FORMAT_CONFIG);
 
         // should not fail, logs warning
         String result = templateChecker.checkPR(TestUtils.TEST_PAYLOAD);
-        whitelistProcessing.processPRComment(TestUtils.ISSUE_PAYLOAD);
 
         Assertions.assertTrue(result.isEmpty());
-        Assertions.assertFalse(DummyAdditionalCommand.isTriggered());
     }
 
     @Test
@@ -101,12 +83,9 @@ public class AdditionalResourcesTest {
     public void emptyAdditionalResourcesPropertyTest() throws InvalidPayloadException {
 //        System.clearProperty(ADDITIONAL_RESOURCES_PROPERTY);
         templateChecker.init(TestUtils.FORMAT_CONFIG);
-        whitelistProcessing.init(TestUtils.FORMAT_CONFIG);
 
         String result = templateChecker.checkPR(TestUtils.TEST_PAYLOAD);
-        whitelistProcessing.processPRComment(TestUtils.ISSUE_PAYLOAD);
 
         Assertions.assertTrue(result.isEmpty());
-        Assertions.assertFalse(DummyAdditionalCommand.isTriggered());
     }
 }

@@ -22,25 +22,30 @@ import org.jboss.tyr.model.yaml.FormatYaml;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import java.net.URLDecoder;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class TestUtils {
 
     public static final String YAML_DIR = "yaml";
     public static final String JSON_DIR = "json";
+    public static final String TARGET_DIR = "target";
 
     public static final JsonObject TEST_PAYLOAD = loadJson(JSON_DIR + "/testPayload.json");
+    public static final JsonObject ISSUE_PAYLOAD = loadJson(JSON_DIR + "/issuePayload.json");
     public static final JsonObject PULL_REQUEST_PAYLOAD = loadJson(JSON_DIR + "/testPullRequestPayload.json");
     public static final JsonObject EMPTY_PAYLOAD = createEmptyJsonPayload();
 
-    public static final JsonArray TEST_COMMITS_PAYLOAD = loadJsonArray(JSON_DIR + "/testCommitsPayload.json");
-
-    public static final FormatYaml FORMAT_CONFIG = loadFormatFromYamlFile(YAML_DIR + "/testTemplate.yaml");
+    public static final FormatYaml FORMAT_CONFIG_CI = loadFormatFromYamlFile(YAML_DIR + "/testTemplateCI.yaml");
 
     public static FormatYaml loadFormatFromYamlFile(String fileName) {
         try {
@@ -48,6 +53,35 @@ public class TestUtils {
             return new ObjectMapper(new YAMLFactory()).readValue(file, FormatYaml.class);
         } catch (IOException e) {
             throw new RuntimeException("Cannot load file " + fileName);
+        }
+    }
+
+    public static void deleteFileIfExists(File file) {
+        if (file.exists()) {
+            file.delete();
+        }
+    }
+
+    public static boolean fileContainsLine(File file, String line) {
+        try (FileReader fileReader = new FileReader(file);
+             BufferedReader br = new BufferedReader(fileReader)) {
+            String fileLine;
+            while ((fileLine = br.readLine()) != null) {
+                if (fileLine.equals(line)) {
+                    return true;
+                }
+            }
+        } catch (IOException e) {
+            throw new IllegalStateException("Cannot read file located in " + file.getPath(), e);
+        }
+        return false;
+    }
+
+    public static void writeLineToFile(String line, File file) {
+        try (FileWriter fileWriter = new FileWriter(file)) {
+            fileWriter.write(line);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Cannot write username to file", e);
         }
     }
 
@@ -69,6 +103,14 @@ public class TestUtils {
 
     private static JsonObject createEmptyJsonPayload() {
         return Json.createObjectBuilder().build();
+    }
+
+    private static Path getFilePath(String fileName) {
+        try {
+            return Paths.get(TestUtils.class.getClassLoader().getResource(fileName).toURI());
+        } catch (URISyntaxException e) {
+            throw new IllegalStateException("Cannot get path of file: " + fileName, e);
+        }
     }
 
     private static File getFile(String fileName) {

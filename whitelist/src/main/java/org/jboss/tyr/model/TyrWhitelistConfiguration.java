@@ -6,7 +6,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import java.util.Optional;
 
 @ConfigProperties(prefix = "tyr")
-public interface TyrConfiguration {
+public interface TyrWhitelistConfiguration {
 
     @ConfigProperty(name = "template.format.url")
     Optional<String> formatFileUrl();
@@ -16,6 +16,9 @@ public interface TyrConfiguration {
 
     @ConfigProperty(name = "github.oauth.token")
     String oauthToken();
+
+    @ConfigProperty(name = "users.dir")
+    Optional<String> whitelistDir();
 
     @ConfigProperty(name = "additional-resources")
     Optional<String> additionalResources();

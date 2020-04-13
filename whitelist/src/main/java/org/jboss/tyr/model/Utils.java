@@ -15,24 +15,33 @@
  */
 package org.jboss.tyr.model;
 
+import javax.json.JsonObject;
+
 public class Utils {
 
-    public static final String GITHUB_BASE = "https://api.github.com";
     public static final String TYR_CONFIG_DIR = "tyr.config.dir";
-    public static final String LINE_SEPARATOR = System.lineSeparator();
-    public static final String GITHUB_LINE_SEPARATOR = "\\r\\n";
+    public static final String USERLIST_FILE_NAME = "user-list.txt";
+    public static final String ADMINLIST_FILE_NAME = "admin-list.txt";
 
     //PR payload
     public static final String PULL_REQUEST = "pull_request";
     public static final String BODY = "body";
     public static final String HEAD = "head";
     public static final String SHA = "sha";
-    public static final String TITLE = "title";
+    public static final String NUMBER = "number";
+    public static final String REF = "ref";
+    public static final String BASE = "base";
     public static final String COMMITS_URL = "commits_url";
 
+    //Issue payload
+    public static final String ISSUE = "issue";
+    public static final String COMMENT = "comment";
+    public static final String USER = "user";
+    public static final String LOGIN = "login";
+    public static final String ACTION = "action";
+
     //Commit payload
-    public static final String COMMIT = "commit";
-    public static final String MESSAGE = "message";
+    public static final String URL = "url";
 
     public static String getConfigDirectory() {
         String path = System.getProperty(TYR_CONFIG_DIR);
@@ -40,5 +49,13 @@ public class Utils {
             return System.getProperty("user.dir");
         }
         return path;
+    }
+
+    public static String getCommentAuthor(JsonObject issuePayload) {
+        return issuePayload.getJsonObject(Utils.COMMENT).getJsonObject(Utils.USER).getString(Utils.LOGIN);
+    }
+
+    public static String getPRAuthor(JsonObject issuePayload) {
+        return issuePayload.getJsonObject(Utils.ISSUE).getJsonObject(Utils.USER).getString(Utils.LOGIN);
     }
 }
